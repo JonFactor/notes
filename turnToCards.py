@@ -4,18 +4,15 @@ with open("./output.json", "r") as f:
     y = json.loads(f.read())
 
 def flatten_data(y):
-    out = {}
+    out = []
 
-    def flatten(x, name=''):
-        if type(x) is list:
-            i = 0
-            for a in x:
-                flatten(a, name + str(i) + '_')
-                i += 1
+    for i in y:
+        if "questions" in i.keys():
+            for ii in i["questions"]:
+                out.append(ii)
         else:
-            out[name[:-1]] = x
+            out.append(i)
 
-    flatten(y)
     return out
 
 print(flatten_data(y))
