@@ -37,12 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'cards',
     'generatecards',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -79,13 +82,20 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'flashcards',
-        'USER': 'jonfactor',
-        'PASSWORD': 'VBBG9DAa1',
+        'USER': 'postgres',
+        'PASSWORD': '21306',
         'HOST': 'localhost',
         'PORT': '5432',
     }
 }
 
+CORS_ALLOW_ALL_ORIGINS = True
+
+APPEND_SLASH=False
+
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:3000', # Example
+# ]
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

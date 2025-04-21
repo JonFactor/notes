@@ -1,7 +1,7 @@
 import json, pathlib, time, httpx, ollama, os
 
 OLLAMA_CONNECTION_STR = os.environ.get("OLLAMA_CONNECTION_STR", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("", "deepseek-r1:7b")
+OLLAMA_MODEL = os.environ.get("", "deepseek-r1:1.5b")
 PROMPT_TEMPLATE_PATH = os.environ.get("PROMPT_TEMPLATE_PATH", "prompt.txt")
 
 def waitForServer(client: ollama.Client, tries:int):
@@ -36,19 +36,30 @@ def executePage(title, content, client, promptTemplate, extraOptions):
             if counter > 3:
                 return json.loads('{"question":"", "answer":""}')
 
-import pymupdf, sys
-def getPages(path:str, startPage):
-    with pymupdf.open(path) as doc:
-        return [page.get_text() for page in doc][startPage:]
+import pymupdf, sys,  base64, io, uuid
+def getPages(b644:str, startPage):
+    b64 = base64.b64decode(b644.replace("data:application/pdf;base64,", ""))
 
-def main(sourcePath:str, title:str, extraOptions:str=""):
+    pages = []
+    filename =  f"./{uuid.uuid1()}.pdf"
+    with open(filename, "wb") as f:
+        f.write(b64)
+
+    with pymupdf.open(filename)  as f:
+        for page in f:
+            pages.append(page.get_text())
+
+    os.remove(filename)
+    return pages
+
+def main(b64:str, title:str, extraOptions:str=""):
     client = ollama.Client(host=OLLAMA_CONNECTION_STR)
     waitForServer(client, 10)
     downloadModel(client, OLLAMA_MODEL)
 
     promptTemplate = pathlib.Path(PROMPT_TEMPLATE_PATH).read_text()
 
-    pages = getPages(sourcePath, 15 )
+    pages = getPages(b64, 1 )
     
     responses = []
     for i in pages:

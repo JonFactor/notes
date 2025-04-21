@@ -16,7 +16,8 @@ export default function FlashCard({
   const [isQuestionSide, setIsQuestionSide] = useState(true);
   return (
     <div>
-      <div>{isQuestionSide ? <h1>{question}</h1> : <h1>{answer}</h1>}</div>
+      <p></p>
+      <div className=" mt-2">{isQuestionSide ? <h1>{parent.length}. {question}</h1> : <h1>{parent.length}. {answer}</h1>}</div>
       <div className=" w-full mt-3">
         {!isQuestionSide && (
           <div className=" float-start space-x-4">

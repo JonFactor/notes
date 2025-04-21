@@ -3,8 +3,8 @@ from django.db import models
 # Create your models here.
 
 class Card(models.Model):
-    question = models.CharField(max_length=500)
-    answer = models.CharField(max_length=500)
+    question = models.CharField(max_length=500, null=False)
+    answer = models.CharField(max_length=500, null=False)
     boxId = models.IntegerField(default=0)
     rememberCount = models.IntegerField(default=0)
     forgotCount = models.IntegerField(default=0)
