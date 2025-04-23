@@ -7,7 +7,7 @@ from cards.serializers import CardSerializer, BoxSerializer
 from .anki import createExportAnki
 from django.core.cache import cache
 import uuid
-from .tasks import likeDoStuff, check_redis_connection
+from .tasks import likeDoStuff
 
 # Create your views here.
 
