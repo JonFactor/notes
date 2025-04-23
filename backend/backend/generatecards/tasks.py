@@ -7,25 +7,25 @@ from cards.serializers import BoxSerializer
 from django.core.cache import cache
 from background_task import background
 
-@shared_task
-def check_redis_connection():
-        try:
-            cache.set('test_key', 'test_value', timeout=5)
-            value = cache.get('test_key')
-            if value == 'test_value':
-                return True
-            else:
-                return False
-        except Exception as e:
-            print(f"Redis connection error: {e}")
-            return False
+# @shared_task
+# def check_redis_connection():
+#         try:
+#             cache.set('test_key', 'test_value', timeout=5)
+#             value = cache.get('test_key')
+#             if value == 'test_value':
+#                 return True
+#             else:
+#                 return False
+#         except Exception as e:
+#             print(f"Redis connection error: {e}")
+#             return False
 
 @background_task(schedule=1)
 def likeDoStuff(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki):
     cache.set(genid, 1)
     print("go hwerewr")
 
-    return genid
+    return False
 
     responses = main(f, name, optionalStr + " " + otherInfo, genid)
         
