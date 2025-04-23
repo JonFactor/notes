@@ -7,7 +7,7 @@ from cards.serializers import CardSerializer, BoxSerializer
 from .anki import createExportAnki
 from django.core.cache import cache
 import uuid
-from .tasks import likeDoStuff
+from .tasks import likeDoStuff, check_redis_connection
 
 # Create your views here.
 
@@ -38,10 +38,8 @@ class GenerateView(APIView):
         else:
             optionalStr = "dont use names of things like naming for items or concepts just the concepts themselves or peoples names in any of the questions make sure its just the content thats being tested not name remeberance"
 
-        print("here")
-        print(likeDoStuff.delay(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki))
-        print("there")
-        
+        #print(likeDoStuff.delay(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki))
+        print(check_redis_connection.delay())
         return Response({'id':genid})
 
 class ProgressView(APIView):
