@@ -39,7 +39,7 @@ class GenerateView(APIView):
             optionalStr = "dont use names of things like naming for items or concepts just the concepts themselves or peoples names in any of the questions make sure its just the content thats being tested not name remeberance"
 
         #print(likeDoStuff.delay(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki))
-        print(check_redis_connection())
+        print(check_redis_connection.delay())
         return Response({'id':genid})
 
 class ProgressView(APIView):
