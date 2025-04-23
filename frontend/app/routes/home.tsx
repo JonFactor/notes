@@ -4,6 +4,7 @@ import FlashCard from "~/components/FlashCard";
 import fs from "fs";
 import { NewBox } from "~/components/NewBox";
 import LoadingInicator from "~/components/LoadingInicator";
+import { deleteBox } from "functions/BackendMsg";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Flashcards" },
@@ -39,7 +40,7 @@ export default function Home() {
   const setBoxStuff = async () => {
     const user = getSetUser();
 
-    await fetch(`http://localhost:8000/api/boxlist/?user=${user}`, {
+    await fetch(`http://192.168.1.141:8000/api/boxlist/?user=${user}`, {
       method: "GET",
     })
       .then(async (data) => {
@@ -85,7 +86,7 @@ export default function Home() {
         },
       };
 
-      const worked = await fetch("http://localhost:8000/api/box/", {
+      const worked = await fetch("http://192.168.1.141:8000/api/box/", {
         method: "PATCH",
         body: JSON.stringify(body),
         headers: {
@@ -113,7 +114,7 @@ export default function Home() {
     const userId = localStorage.getItem("flashcardappkeythingy");
 
     await fetch(
-      `http://localhost:8000/api/box/?id=${id}&userId=${userId}`
+      `http://192.168.1.141:8000/api/box/?id=${id}&userId=${userId}`
     ).then(async (res) => {
       setCardData(await res.json());
       setIsBoxOpen(true);
@@ -125,10 +126,13 @@ export default function Home() {
   const handelDelete = async (id: any) => {
     const userId = localStorage.getItem("flashcardappkeythingy");
     const boxIndex = boxsData.ids.indexOf(id);
-    await fetch(`http://localhost:8000/api/box/?id=${id}&userId=${userId}`, {
-      method: "DELETE",
-      body: JSON.stringify({ id: id, userId: userId }),
-    }).then((res) => {
+    await fetch(
+      `http://192.168.1.141:8000/api/box/?id=${id}&userId=${userId}`,
+      {
+        method: "DELETE",
+        body: JSON.stringify({ id: id, userId: userId }),
+      }
+    ).then((res) => {
       if (res.status === 200) {
         const data = boxsData;
         data.names.splice(boxIndex, 1);
@@ -146,9 +150,7 @@ export default function Home() {
     const card = cardData.cards[responses.length];
     const id = card.id;
 
-    await fetch(`http://localhost:8000/api/card/?id=${id}&userId=${userId}`, {
-      method: "DELETE",
-    }).then((res) => {
+    deleteBox(id, userId).then((res) => {
       if (res.status === 200) {
         handelOpenBox(card.boxId);
       }
