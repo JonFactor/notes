@@ -14,7 +14,7 @@ export default function LoadingInicator({ progId, setProgId }: params) {
         return;
       }
 
-      fetch("http://localhost:8000/api/progress/?id=" + progId, {
+      fetch("http://192.168.1.141:8000/api/progress/?id=" + progId, {
         method: "GET",
       }).then(async (res) => {
         const data = await res.json();

@@ -13,6 +13,7 @@ from django_rq import job
 @job
 def likeDoStuff(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki):
     cache.set(genid, 0)
+    print("go hwerewr")
 
     responses = main(f, name, optionalStr + " " + otherInfo, genid)
         
