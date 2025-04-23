@@ -6,7 +6,7 @@ from cards.models import Card, Box
 from cards.serializers import BoxSerializer
 from django.core.cache import cache
 
-@shared_task
+
 def check_redis_connection():
         try:
             cache.set('test_key', 'test_value', timeout=5)
