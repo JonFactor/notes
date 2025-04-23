@@ -20,7 +20,7 @@ from background_task import background
 #             print(f"Redis connection error: {e}")
 #             return False
 
-@background_task(schedule=1)
+@background(schedule=1)
 def likeDoStuff(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki):
     cache.set(genid, 1)
     print("go hwerewr")
