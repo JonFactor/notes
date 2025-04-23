@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-ch&57ey67gq&--ojl$sh2uhvy8hz-yhhr0g!d@bhhe_kk-f3=s
 DEBUG = True
 
 
-ALLOWED_HOSTS = ["192.168.1.141", "localhost"]
+ALLOWED_HOSTS = ["192.168.1.141", "localhost", '127.0.0.1']
 
 
 
@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.core.cache',
-    'django_rq',
     'corsheaders',
     'rest_framework',
     'cards',
@@ -89,7 +88,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': '21306',
         'HOST': 'localhost',
-        'PORT': '5431',
+        'PORT': '5432',
     }
 }
 
@@ -119,24 +118,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CACHES = {
-	"default": {
-		"BACKEND": "django_redis.cache.RedisCache",
-		"LOCATION": "redis://127.0.0.1:6379/1",
-		"OPTIONS": {
-			"CLIENT_CLASS": "django_redis.client.DefaultClient",
-			   }
-		    }
-
-}
-
-RQ_QUEUES = {
-    'default': {
-        'HOST': '127.0.0.1',
-        'PORT': 6379,
-        'DB': 0,
-    }
-}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -159,3 +140,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_TIMEZONE = "Australia/Tasmania"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'my_cache_table',
+    }
+}
+BROKER_URL =  'http://localhost:6379/1'
