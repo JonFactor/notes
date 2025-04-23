@@ -153,4 +153,4 @@ CACHES = {
         'LOCATION': 'my_cache_table',
     }
 }
-BROKER_URL =  'http://127.0.0.1:6379/1'
+BROKER_URL =  'redis://127.0.0.1:6379'
