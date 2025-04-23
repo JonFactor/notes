@@ -4,6 +4,7 @@ Flashily.ai
 pdf-anki
 venv
 venv2
+data
 
 # Django #
 *.log
