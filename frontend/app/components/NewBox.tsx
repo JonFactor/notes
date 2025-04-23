@@ -109,7 +109,7 @@ export const NewBox = ({
       return;
     }
 
-    fetch("http://127.0.0.1:8000/api/generate/", {
+    fetch("http://192.168.1.141:8000/api/generate/", {
       method: "POST",
       body: JSON.stringify(data2),
       headers: { "content-type": "application/json" },
