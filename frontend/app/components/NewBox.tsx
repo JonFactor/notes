@@ -4,12 +4,14 @@ interface params {
   parrentSetter: React.Dispatch<React.SetStateAction<boolean>>;
   setRefreshPlease: React.Dispatch<React.SetStateAction<boolean>>;
   refreshPlease: boolean;
+  setProgId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const NewBox = ({
   parrentSetter,
   setRefreshPlease,
   refreshPlease,
+  setProgId,
 }: params) => {
   const [data, setData] = useState({
     name: "",
@@ -115,12 +117,10 @@ export const NewBox = ({
       .then(async (res) => {
         setRefreshPlease(!refreshPlease);
 
-        // if (data2.isAnki) {
-        const resdata = await res.json();
-        base64ToFile(resdata["anki"], data2.name + ".apkg");
+        const prog = (await res.json()).id;
+        console.log(prog);
+        setProgId(prog);
         // }
-
-        alert("Finished!");
       })
       .catch(() => {
         alert("A Problem Occured Please Try Again Later.");

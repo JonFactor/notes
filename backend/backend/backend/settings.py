@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.core.cache',
+    'django_rq',
     'corsheaders',
     'rest_framework',
     'cards',
@@ -115,6 +117,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': '127.0.0.1',
+        'PORT': 6379,
+        'DB': 0,
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

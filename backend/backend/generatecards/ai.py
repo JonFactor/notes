@@ -1,7 +1,7 @@
 import json, pathlib, time, httpx, ollama, os
 
 OLLAMA_CONNECTION_STR = os.environ.get("OLLAMA_CONNECTION_STR", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("", "deepseek-r1:1.5b")
+OLLAMA_MODEL = os.environ.get("", "deepseek-r1:8b")
 PROMPT_TEMPLATE_PATH = os.environ.get("PROMPT_TEMPLATE_PATH", "prompt.txt")
 
 def waitForServer(client: ollama.Client, tries:int):
@@ -52,7 +52,12 @@ def getPages(b644:str, startPage):
     os.remove(filename)
     return pages
 
-def main(b64:str, title:str, extraOptions:str=""):
+
+from django.core.cache import cache
+
+def main(b64:str, title:str, extraOptions:str="", id=0):
+    
+    print("here")
     client = ollama.Client(host=OLLAMA_CONNECTION_STR)
     waitForServer(client, 10)
     downloadModel(client, OLLAMA_MODEL)
@@ -64,6 +69,8 @@ def main(b64:str, title:str, extraOptions:str=""):
     responses = []
     for i in pages:
         responses.append(executePage(title, i, client, promptTemplate, extraOptions))
+        print(float(cache.get(id))+pages.index(i)/len(pages))
+        cache.set(id, float(cache.get(id))+pages.index(i)/len(pages))
         print(f"page:{pages.index(i)}/{len(pages)}")
 
     def flatten_data(y):

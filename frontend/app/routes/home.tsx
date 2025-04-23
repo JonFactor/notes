@@ -3,6 +3,7 @@ import type { Route } from "./+types/home";
 import FlashCard from "~/components/FlashCard";
 import fs from "fs";
 import { NewBox } from "~/components/NewBox";
+import LoadingInicator from "~/components/LoadingInicator";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Flashcards" },
@@ -22,6 +23,7 @@ export default function Home() {
   const [isBoxAvalible, setIsBoxAvalible] = useState(false);
   const [isBoxOpen, setIsBoxOpen] = useState(false);
   const [refreshPlease, setRefreshPlease] = useState(false);
+  const [progId, setProgId] = useState("");
 
   const [responses, setResponses] = useState<Array<boolean>>([]);
 
@@ -122,14 +124,19 @@ export default function Home() {
 
   const handelDelete = async (id: any) => {
     const userId = localStorage.getItem("flashcardappkeythingy");
-
+    const boxIndex = boxsData.ids.indexOf(id);
     await fetch(`http://localhost:8000/api/box/?id=${id}&userId=${userId}`, {
       method: "DELETE",
       body: JSON.stringify({ id: id, userId: userId }),
     }).then((res) => {
       if (res.status === 200) {
-        setIsBoxAvalible(boxsData.ids.length === 1);
-        setBoxesData(null);
+        const data = boxsData;
+        data.names.splice(boxIndex, 1);
+        data.ids.splice(boxIndex, 1);
+        setBoxesData({
+          names: data.names,
+          ids: data.ids,
+        });
       }
     });
   };
@@ -161,6 +168,12 @@ export default function Home() {
           Supporting Projects
         </a>
       </div>
+      {progId !== "" && progId !== undefined && (
+        <LoadingInicator
+          progId={progId}
+          setProgId={setProgId}
+        ></LoadingInicator>
+      )}
 
       <div className=" flex justify-center mt-62 space-x-20">
         {!isBoxOpen && (
@@ -182,6 +195,8 @@ export default function Home() {
                   parrentSetter={setIsCreateOpen}
                   setRefreshPlease={setRefreshPlease}
                   refreshPlease={refreshPlease}
+                  setProgId={setProgId}
+                  s
                 />
               ) : (
                 <div className="flex flex-col justify-center">
@@ -204,29 +219,29 @@ export default function Home() {
                   <h1>Box List</h1>
                 </div>
                 <div className="  ">
-                  <div className="float-left">
+                  <div className="grid grid-cols-2 space-x-4 space-y-3 mt-4">
                     {boxsData.names?.map((item: any, index: number) => (
-                      <div key={index.toString()} className=" mt-3">
+                      <div
+                        key={index.toString()}
+                        className="   bg-slate-800 justify-center align-middle px-2 rounded-lg py-2"
+                      >
                         <button
+                          className=" float-left"
                           onClick={() => {
                             handelOpenBox(boxsData.ids[index]);
                           }}
                         >
                           <h2>{item}</h2>
                         </button>
+                        <button
+                          className=" px-2 ml-2 rounded-md bg-red-800 text-center font-extrabold  text-md  float-right"
+                          onClick={() => {
+                            handelDelete(boxsData.ids[index]);
+                          }}
+                        >
+                          <h2>-</h2>
+                        </button>
                       </div>
-                    ))}
-                  </div>
-                  <div className=" float-right">
-                    {boxsData.names?.map((item: any, index: number) => (
-                      <button
-                        className=" px-2 ml-2 rounded-md bg-red-800 text-center font-extrabold  text-md mt-3"
-                        onClick={() => {
-                          handelDelete(boxsData.ids[index]);
-                        }}
-                      >
-                        <h2>-</h2>
-                      </button>
                     ))}
                   </div>
                 </div>
