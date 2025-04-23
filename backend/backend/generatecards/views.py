@@ -7,11 +7,16 @@ from cards.serializers import CardSerializer, BoxSerializer
 from .anki import createExportAnki
 from django.core.cache import cache
 import uuid
+from django.utils.decorators import method_decorator
+from django.utils.decorators.cache import cache_page
+from celery import task
 
 # Create your views here.
 from django_rq import job
-@job
+
+@task
 def likeDoStuff(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki):
+    print("go hwerewr")
     cache.set(genid, 0)
     print("go hwerewr")
 
