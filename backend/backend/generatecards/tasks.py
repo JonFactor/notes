@@ -8,8 +8,7 @@ from django.core.cache import cache
 
 @shared_task
 def likeDoStuff(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki):
-    print("go hwerewr")
-    cache.set(genid, 0)
+    #cache.set(genid, 0)
     print("go hwerewr")
 
     responses = main(f, name, optionalStr + " " + otherInfo, genid)
