@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.core.cache',
+    'background_task',
     'corsheaders',
     'rest_framework',
     'cards',
@@ -88,7 +89,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': '21306',
         'HOST': 'localhost',
-        'PORT': '5431',
+        'PORT': '5432',
     }
 }
 

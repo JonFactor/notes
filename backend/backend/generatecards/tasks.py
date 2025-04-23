@@ -5,6 +5,7 @@ from .ai import main
 from cards.models import Card, Box
 from cards.serializers import BoxSerializer
 from django.core.cache import cache
+from background_task import background
 
 @shared_task
 def check_redis_connection():
@@ -19,7 +20,7 @@ def check_redis_connection():
             print(f"Redis connection error: {e}")
             return False
 
-@shared_task
+@background_task(schedule=1)
 def likeDoStuff(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki):
     cache.set(genid, 1)
     print("go hwerewr")
