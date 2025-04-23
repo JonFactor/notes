@@ -47,7 +47,7 @@ class GenerateView(APIView):
 class ProgressView(APIView):
     def get(self, request):
         progid = request.query_params.get('id')
-        status = cache.get(progid)
+        status = 1 # cache.get(progid)
         return Response({'status':status})
 
 class ExportView(APIView):
