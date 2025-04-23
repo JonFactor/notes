@@ -53,7 +53,7 @@ def getPages(b644:str, startPage):
     return pages
 
 
-#from django.core.cache import cache
+from django.core.cache import cache
 
 def main(b64:str, title:str, extraOptions:str="", id=0):
     
@@ -69,9 +69,9 @@ def main(b64:str, title:str, extraOptions:str="", id=0):
     responses = []
     for i in pages:
         responses.append(executePage(title, i, client, promptTemplate, extraOptions))
-        # print(float(cache.get(id))+pages.index(i)/len(pages))
-        # cache.set(id, float(cache.get(id))+pages.index(i)/len(pages))
-        # print(f"page:{pages.index(i)}/{len(pages)}")
+        print(float(cache.get(id))+pages.index(i)/len(pages))
+        cache.set(id, float(cache.get(id))+pages.index(i)/len(pages))
+        print(f"page:{pages.index(i)}/{len(pages)}")
 
     def flatten_data(y):
         out = []

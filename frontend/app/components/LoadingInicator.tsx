@@ -21,7 +21,7 @@ export default function LoadingInicator({ progId, setProgId }: params) {
         console.log(data);
         setPercent((data.status * 100).toString());
 
-        if (data.status === "1") {
+        if (data.status === 1) {
           setProgId("");
         }
       });
