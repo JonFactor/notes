@@ -22,10 +22,7 @@ from background_task import background
 
 @background(schedule=1)
 def likeDoStuff(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki):
-    cache.set(genid, 1)
-    print("go hwerewr")
-
-    return False
+    cache.set(genid, 0)
 
     responses = main(f, name, optionalStr + " " + otherInfo, genid)
         
