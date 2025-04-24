@@ -57,7 +57,6 @@ from django.core.cache import cache
 
 def main(b64:str, title:str, extraOptions:str="", id=0):
     
-    print("here")
     client = ollama.Client(host=OLLAMA_CONNECTION_STR)
     waitForServer(client, 10)
     downloadModel(client, OLLAMA_MODEL)
