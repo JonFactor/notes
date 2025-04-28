@@ -1,18 +1,7 @@
+import { generateBox } from "functions/BackendMsg";
 import React, { useEffect, useRef, useState } from "react";
 
-interface params {
-  parrentSetter: React.Dispatch<React.SetStateAction<boolean>>;
-  setRefreshPlease: React.Dispatch<React.SetStateAction<boolean>>;
-  refreshPlease: boolean;
-  setProgId: React.Dispatch<React.SetStateAction<string>>;
-}
-
-export const NewBox = ({
-  parrentSetter,
-  setRefreshPlease,
-  refreshPlease,
-  setProgId,
-}: params) => {
+export const NewBoxForm = () => {
   const [data, setData] = useState({
     name: "",
     useNames: false,
@@ -20,6 +9,8 @@ export const NewBox = ({
     otherInfo: "",
     useAnki: false,
   });
+
+  const [progId, setProgId] = useState(null);
 
   const uploadThingy = useRef<HTMLInputElement>(null);
 
@@ -31,7 +22,6 @@ export const NewBox = ({
       otherInfo: "",
       useAnki: false,
     });
-    parrentSetter(false);
   };
 
   const convertBase64 = (file: any) => {
@@ -93,7 +83,7 @@ export const NewBox = ({
     URL.revokeObjectURL(url);
   }
 
-  const handelBoxCreate = () => {
+  const handelBoxCreate = async () => {
     const data2 = {
       file: file64,
       name: data.name,
@@ -109,22 +99,14 @@ export const NewBox = ({
       return;
     }
 
-    fetch("http://192.168.1.141:8000/api/generate/", {
-      method: "POST",
-      body: JSON.stringify(data2),
-      headers: { "content-type": "application/json" },
-    })
+    await generateBox(data2)
       .then(async (res) => {
-        setRefreshPlease(!refreshPlease);
-
         const prog = (await res.json()).id;
         console.log(prog);
         setProgId(prog);
         // }
       })
-      .catch(() => {
-        alert("A Problem Occured Please Try Again Later.");
-      });
+      .catch(() => {});
     alert("submited, give us 3 - 10 minutes.");
     setData({
       name: "",
@@ -133,7 +115,6 @@ export const NewBox = ({
       otherInfo: "",
       useAnki: false,
     });
-    parrentSetter(false);
   };
 
   const handelFile = () => {
@@ -144,7 +125,7 @@ export const NewBox = ({
   };
 
   return (
-    <>
+    <div className="px-6 ">
       <input
         type="file"
         className=" invisible"
@@ -153,93 +134,107 @@ export const NewBox = ({
         accept=".pdf"
       ></input>
 
-      {file64 === null && uploadThingy !== null ? (
-        <button
-          className="bg-gray-700 py-2 rounded-md text-lg"
-          onClick={handelFile}
-        >
-          Upload Document
-        </button>
-      ) : (
-        <div>
-          <p className=" text-xl">{uploadThingy.current.files[0].name}</p>
-          <p>{uploadThingy.current.files[0].type}</p>
-          <button
-            className="bg-gray-400 py-2 rounded-md text-lg w-full mt-6"
-            onClick={handelFile}
-          >
-            Replace Document
-          </button>
-        </div>
-      )}
-
-      <div className="flex space-x-2 mt-4">
-        <p>Name</p>
+      <div className="flex flex-col space-x-2 mt-4 text-3xl">
+        <p className=" font-semibold">Name</p>
         <input
           type="text"
           value={data.name}
           onChange={(e) => {
             setData({ ...data, name: e.target.value });
           }}
-          className=" bg-white rounded-md text-black px-1  w-full "
+          className=" bg-white  text-black px-2  py-2 mt-1  w-full "
         />
       </div>
-      <div className=" grid  grid-cols-2">
-        <div className="flex space-x-2 mt-4">
-          <p>Use Terms</p>
+      <h1 className=" mt-6 text-3xl  font-semibold">Options</h1>
+      <div className=" flex">
+        <div className=" flex flex-col space-y-14 w-5/12  mt-6">
+          <div className="flexalign-middle">
+            <p className=" text-3xl  my-auto">use terminology</p>
+          </div>
+          <div className="flex  align-middle">
+            <p className=" text-3xl  my-auto">use peoples names</p>
+          </div>
+          <div className="flex  align-middle">
+            <p className=" text-3xl  my-auto">install anki file</p>
+          </div>
+        </div>
+        <div className=" flex flex-col space-y-9 mt-4">
           <input
             type="checkbox"
             checked={data.useTerminology}
             onChange={(e) => {
               setData({ ...data, useTerminology: e.target.checked });
             }}
-            className=" bg-white rounded-md text-black px-1 "
+            className=" bg-white rounded-md text-black px-1 w-14 h-14  "
           />
-        </div>
-        <div className="flex space-x-2 mt-4">
-          <p>Use Peoples Names</p>
           <input
             type="checkbox"
             checked={data.useNames}
             onChange={(e) => {
               setData({ ...data, useNames: e.target.checked });
             }}
-            className=" bg-white rounded-md text-black px-1 "
+            className=" bg-white rounded-md text-black px-1  w-14 h-14 "
           />
-        </div>
-        <div className="flex space-x-2 mt-4">
-          <p>Install Anki File</p>
           <input
             type="checkbox"
             checked={data.useAnki}
             onChange={(e) => {
               setData({ ...data, useAnki: e.target.checked });
             }}
-            className=" bg-white rounded-md text-black px-1 "
+            className=" bg-white rounded-md text-black px-1 w-14 h-14 "
           />
+        </div>
+        <div className="w-5/10 px-12  py-2 mt-2 flex  ">
+          {file64 === null && uploadThingy !== null ? (
+            <button
+              className="bg-[#FFF2AA] w-full h-full rounded-md text-4xl"
+              onClick={handelFile}
+            >
+              Upload Document
+            </button>
+          ) : (
+            <div>
+              {uploadThingy.current !== null &&
+                uploadThingy.current.files !== null && (
+                  <div className=" px-6 py-4 bg-[#FFF2AA] rounded-xl">
+                    <p className=" text-xl">
+                      {uploadThingy.current.files[0].name}
+                    </p>
+                  </div>
+                )}
+
+              <button
+                className="bg-[#FFF2AA] py-2 rounded-md text-xl w-full mt-6 "
+                onClick={handelFile}
+              >
+                Replace Document
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="flex flex-col space-x-2 mt-4">
-        <p>Other Instructions:</p>
+      <div className="flex flex-col space-x-2 mt-8 text-3xl">
+        <p className=" font-semibold">Other Instructions</p>
         <input
           type="text"
           value={data.otherInfo}
           onChange={(e) => {
             setData({ ...data, otherInfo: e.target.value });
           }}
-          className=" bg-white rounded-md text-black px-1 mt-1"
+          className=" bg-white  text-black px-2  py-2 mt-1  w-full"
         />
       </div>
 
-      <div className=" flex space-x-2 mt-4">
-        <button className="px-2 bg-red-800" onClick={handelLeave}>
-          <p>cancel</p>
-        </button>
-        <button className="w-full bg-green-800" onClick={handelBoxCreate}>
-          <p>submit</p>
-        </button>
+      <div className=" flex justify-end mt-10 w-full">
+        <a
+          className="w-1/3 bg-[#FFF6D0] px-6 py-3 rounded-xl"
+          onClick={handelBoxCreate}
+          href={`/loading?progId=${progId}`}
+        >
+          <p className="w-full text-left text-2xl">Submit</p>
+        </a>
       </div>
-    </>
+    </div>
   );
 };

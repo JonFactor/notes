@@ -19,14 +19,15 @@ class GenerateView(APIView):
     def post(self, request):
         genid = uuid.uuid4()
 
-        name = request.data.get("name")
+        name = request.data.get("name", "NONE")
         f = request.data.get('file')
-        ignoreRewrite = request.data.get('rewriteIgnore')
+        ignoreRewrite = request.data.get('rewriteIgnore', True)
         user = request.data.get('user', 1)
         isRemeberingPeopleNames = request.data.get('isPeopleNames', True)
         isRemeberingThingNames = request.data.get('isThingNames', True)
         otherInfo = request.data.get('otherInfo', "")
         isAnki = request.data.get("isAnki", False)
+
 
         optionalStr = ""
         if isRemeberingPeopleNames and isRemeberingThingNames:

@@ -69,11 +69,11 @@ def main(b64:str, title:str, extraOptions:str="", id=0):
     pages = getPages(b64, 1 )
     
 	
-    cache.set(id, .1)
+    cache.set(id, .01)
     responses = []
     for i in pages:
         responses.append(executePage(title, i, client, promptTemplate, extraOptions))
-        cache.set(id, float(.1+(pages.index(i)/len(pages))*(.9)))
+        cache.set(id, pages.index(i)/len(pages))
         print(f"page:{pages.index(i)}/{len(pages)}")
 
     def flatten_data(y):

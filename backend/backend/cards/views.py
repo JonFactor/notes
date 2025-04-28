@@ -10,15 +10,48 @@ class BoxListView(APIView):
 
         boxes = Box.objects.filter(user = request.query_params['user'])
 
-        names = []
         ids = []
         for i in boxes:
-            names.append(i.name)
             ids.append(i.id)
 
-        data = {"names":names, "ids": ids}
+        data = { "ids": ids}
 
         return Response(data=data)
+
+class BoxSpecificsView(APIView):
+    def get(self,  request):
+        boxId = request.query_params['id']
+        userId = request.query_params['userId']
+
+        box  =  Box.objects.filter(id=boxId, user=userId).first()
+        if  box  is  None:
+            return Response()
+        
+        # get r  to f
+        cards  = Card.objects.filter(boxId=boxId)
+
+        Rcount = 0
+        Fcount = 0
+        for card  in cards:
+            Rcount += card.forgotCount
+            Fcount += card.rememberCount
+
+        rtof  =  0
+        if Rcount == 0 and  Fcount == 0:
+            rtof = 0
+        elif Rcount ==  0:
+            rtof = 0
+        elif Fcount ==  0:
+            rtof = 100
+        else:
+            rtof = Rcount / Fcount
+        
+        data = {"name":box.name, "Completions": box.numCompletions, "RtoF":rtof}
+
+
+
+        return Response(data=data)
+
 
 class BoxView(APIView):
     def get(self, request):

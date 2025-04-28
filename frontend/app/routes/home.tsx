@@ -1,16 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import type { Route } from "./+types/home";
-import FlashCard from "~/components/FlashCard";
 import fs from "fs";
-import { NewBox } from "~/components/NewBox";
-import LoadingInicator from "~/components/LoadingInicator";
-import { deleteBox } from "functions/BackendMsg";
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "Flashcards" },
-    { name: "description", content: "Lets view those Cards" },
-  ];
-}
+import {
+  deleteBox,
+  deleteCard,
+  getCards,
+  getUserBoxs,
+  updateProgressBox,
+} from "functions/BackendMsg";
+import TitleMod from "~/components/modules/TitleMod";
+import BoxListMod from "~/components/modules/BoxListMod";
+import useWindowDimensions from "~/hooks/WindowDimensions";
 
 export default function Home() {
   const [cardData, setCardData] = useState({
@@ -20,13 +19,15 @@ export default function Home() {
     completions: 0,
   });
 
-  const [boxsData, setBoxesData] = useState<any>({ names: [], ids: [] });
+  const [boxsData, setBoxesData] = useState<any>({ ids: [] });
   const [isBoxAvalible, setIsBoxAvalible] = useState(false);
   const [isBoxOpen, setIsBoxOpen] = useState(false);
   const [refreshPlease, setRefreshPlease] = useState(false);
   const [progId, setProgId] = useState("");
 
   const [responses, setResponses] = useState<Array<boolean>>([]);
+
+  const { width, height } = useWindowDimensions();
 
   useEffect(() => {
     // set box data in list here and device id
@@ -40,9 +41,7 @@ export default function Home() {
   const setBoxStuff = async () => {
     const user = getSetUser();
 
-    await fetch(`http://192.168.1.141:8000/api/boxlist/?user=${user}`, {
-      method: "GET",
-    })
+    getUserBoxs(user)
       .then(async (data) => {
         const body = await data.json();
         setBoxesData(body);
@@ -86,15 +85,7 @@ export default function Home() {
         },
       };
 
-      const worked = await fetch("http://192.168.1.141:8000/api/box/", {
-        method: "PATCH",
-        body: JSON.stringify(body),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).catch((err) => {
-        return false;
-      });
+      const worked = await updateProgressBox(body);
 
       if (!worked) {
         alert("ts didnt work :( try again.");
@@ -113,9 +104,7 @@ export default function Home() {
   const handelOpenBox = async (id: any) => {
     const userId = localStorage.getItem("flashcardappkeythingy");
 
-    await fetch(
-      `http://192.168.1.141:8000/api/box/?id=${id}&userId=${userId}`
-    ).then(async (res) => {
+    await getCards(id, userId).then(async (res) => {
       setCardData(await res.json());
       setIsBoxOpen(true);
     });
@@ -126,13 +115,7 @@ export default function Home() {
   const handelDelete = async (id: any) => {
     const userId = localStorage.getItem("flashcardappkeythingy");
     const boxIndex = boxsData.ids.indexOf(id);
-    await fetch(
-      `http://192.168.1.141:8000/api/box/?id=${id}&userId=${userId}`,
-      {
-        method: "DELETE",
-        body: JSON.stringify({ id: id, userId: userId }),
-      }
-    ).then((res) => {
+    await deleteBox(boxIndex, userId).then((res) => {
       if (res.status === 200) {
         const data = boxsData;
         data.names.splice(boxIndex, 1);
@@ -150,7 +133,7 @@ export default function Home() {
     const card = cardData.cards[responses.length];
     const id = card.id;
 
-    deleteBox(id, userId).then((res) => {
+    deleteCard(id, userId).then((res) => {
       if (res.status === 200) {
         handelOpenBox(card.boxId);
       }
@@ -160,8 +143,104 @@ export default function Home() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   return (
-    <div className="w-full">
-      <div className="flex  w-full mt-6  align-center justify-center space-x-4  ">
+    <div className={`w-full flex ${width < 1400 && "flex-col"}`}>
+      {/* {"1"} */}
+      <div className={width > 1400 ? ` w-1/3` : "w-full"}>
+        <div>
+          <TitleMod vertical={false} absolute={false} />
+          <h1 className=" ml-14 text-2xl">flashcard generator</h1>
+          <div className="bg-[#F2DC5D] w-1/2 text-2xl ml-14 mt-2 rounded-xl  text-white  py-3">
+            <a href="/" className=" w-full flex">
+              <h1 className="  mx-auto">supporting projects</h1>
+            </a>
+          </div>
+        </div>
+        {width > 1400 && (
+          <div className=" w-11/12 rounded-4xl mx-auto flex flex-col pb-6 bg-white mt-6 border-[#F2DC5D] border-8 border-solid">
+            <h1 className="  text-5xl font-semibold mx-auto mt-2">
+              Advanced Stats
+            </h1>
+            <div className="w-8/9  flex justify-end">
+              <img src="/science.svg" className=" h-14 " />
+            </div>
+            <p className="  w-9/12 mx-auto  mt-6  text-3xl">
+              We Are Currently Developing this Module! Support us by visiting
+              our supporting projects above! THX
+            </p>
+            <img src="/satalite.svg" className=" h-64 mt-5 " />
+          </div>
+        )}
+      </div>
+      {/* {"2"} */}
+      <div className={width > 1400 ? ` w-1/3` : "w-full"}>
+        <h1 className=" ml-10 mt-12 text-5xl">How It Works</h1>
+        <div className=" w-7/12 flex justify-end">
+          <img src="/work.svg" className="h-14 " />
+        </div>
+        {width < 1400 && (
+          <div className={` mt-10 w-6/10 ml-6`}>
+            <a href="/generate">
+              <img src="/buildbtn.svg" />
+            </a>
+          </div>
+        )}
+        <div className=" px-8 mt-8 w-full">
+          <div className=" flex space-x-5 w-full justify-center">
+            <img src="/form.svg" className="w-1/3  " />
+            <img src="/plus.svg" className="w-12 " />
+            <img src="/pdf.svg" className="w-2/7 " />
+          </div>
+          <div className=" flex  mt-6 space-x-16 justify-center">
+            <img src="/waiting.svg" className="w-1/3 " />
+            <div className="w-1/3">
+              <h1 className=" text-3xl font-semibold">AI Magic</h1>
+              <img src="/server.svg" className="w-full mt-2" />
+            </div>
+          </div>
+          <div className=" flex justify-center space-x-26 mt-4">
+            <img src="/report.svg" className="w-1/5 " />
+            <img src="/card.svg" className="w-1/4" />
+          </div>
+        </div>
+        <div className=" flex justify-end w-full ">
+          {width > 1400 && (
+            <div className={` mt-4 w-6/10`}>
+              <a href="/generate">
+                <img src="/buildbtn.svg" />
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+      {/* {"3"} */}
+      <div
+        className={
+          width > 1400
+            ? ` w-1/3 flex  relative z-0`
+            : "w-full flex  relative z-0 mt-10"
+        }
+      >
+        {width > 1400 && (
+          <div className=" mt-4  z-10  absolute ">
+            <img src="/cards.svg" className=" " />
+          </div>
+        )}
+
+        <div className=" w-full flex justify-end">
+          <div
+            className=" bg-[#FFF6D0] h-full  "
+            style={{ width: width > 1400 ? "88%" : "100%" }}
+          >
+            {isBoxAvalible && (
+              <BoxListMod boxIds={boxsData.ids} userId={getSetUser()} />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+  {
+    /* <div className="flex  w-full mt-6  align-center justify-center space-x-4  ">
         <h1 className=" text-4xl">Flash.Ai</h1>
         <a
           className=" h-full px-6 py-1 mt-1 bg-green-800 rounded-3xl"
@@ -301,7 +380,6 @@ export default function Home() {
             </div>
           </div>
         )}
-      </div>
-    </div>
-  );
+      </div> */
+  }
 }

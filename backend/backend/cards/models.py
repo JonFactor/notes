@@ -12,7 +12,7 @@ class Card(models.Model):
     
 
 class Box(models.Model):
-    name = models.CharField(max_length=300)
-    user = models.CharField(max_length=2000)
+    name = models.CharField(max_length=300, default="NONE")
+    user = models.CharField(max_length=2000, default="")
     numCompletions = models.IntegerField(default=0)
 
