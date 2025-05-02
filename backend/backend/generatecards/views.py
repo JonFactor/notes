@@ -8,6 +8,7 @@ from .anki import createExportAnki
 from django.core.cache import cache
 import uuid
 from .tasks import likeDoStuff
+from background_task.models import Task
 
 # Create your views here.
 
@@ -40,13 +41,21 @@ class GenerateView(APIView):
             optionalStr = "dont use names of things like naming for items or concepts just the concepts themselves or peoples names in any of the questions make sure its just the content thats being tested not name remeberance"
 
         #print(likeDoStuff.delay(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki))
-        likeDoStuff(f, name, optionalStr, otherInfo, str(genid), user, ignoreRewrite, isAnki)
+        likeDoStuff(f, name, optionalStr, otherInfo, str(genid), user, ignoreRewrite, isAnki, verbose_name=genid)
         return Response({'id':genid})
 
 class ProgressView(APIView):
     def get(self, request):
         progid = request.query_params.get('id')
         status = cache.get(progid)
+
+        task = Task.objects.filter(verbose_name=progid).first()
+
+        if task != None:
+            otherTasks = Task.objects.filter(id__lt=task.id)
+            if len(otherTasks) > 0:
+                return Response({'queuePlacement': len(otherTasks)+1, 'status':status})
+        
         return Response({'status':status})
 
 class ExportView(APIView):
@@ -56,7 +65,15 @@ class ExportView(APIView):
         data  = createExportAnki(Box.objects.filter(user=user, name=name).first().id)
         return Response({'anki':data})
 
-    
+
+       
+
+
+        
+
+
+        
+
 
 
 

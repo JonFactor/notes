@@ -1,5 +1,6 @@
 import { generateBox } from "functions/BackendMsg";
 import React, { useEffect, useRef, useState } from "react";
+import { Router, useNavigate } from "react-router";
 
 export const NewBoxForm = () => {
   const [data, setData] = useState({
@@ -83,6 +84,8 @@ export const NewBoxForm = () => {
     URL.revokeObjectURL(url);
   }
 
+  const navigate = useNavigate();
+
   const handelBoxCreate = async () => {
     const data2 = {
       file: file64,
@@ -102,19 +105,18 @@ export const NewBoxForm = () => {
     await generateBox(data2)
       .then(async (res) => {
         const prog = (await res.json()).id;
-        console.log(prog);
-        setProgId(prog);
+        alert("submited, give us 3 - 10 minutes.");
+        setData({
+          name: "",
+          useNames: false,
+          useTerminology: false,
+          otherInfo: "",
+          useAnki: false,
+        });
+        navigate("/loading?id=" + prog);
         // }
       })
       .catch(() => {});
-    alert("submited, give us 3 - 10 minutes.");
-    setData({
-      name: "",
-      useNames: false,
-      useTerminology: false,
-      otherInfo: "",
-      useAnki: false,
-    });
   };
 
   const handelFile = () => {
@@ -227,13 +229,12 @@ export const NewBoxForm = () => {
       </div>
 
       <div className=" flex justify-end mt-10 w-full">
-        <a
+        <button
           className="w-1/3 bg-[#FFF6D0] px-6 py-3 rounded-xl"
           onClick={handelBoxCreate}
-          href={`/loading?progId=${progId}`}
         >
           <p className="w-full text-left text-2xl">Submit</p>
-        </a>
+        </button>
       </div>
     </div>
   );

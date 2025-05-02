@@ -21,10 +21,12 @@ import time
 #             print(f"Redis connection error: {e}")
 #             return False
 
-@background()
+@background(queue="ai")
 def likeDoStuff(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki):
     cache.set(genid, 0)
 
+    responses = main(f, name, optionalStr + " " + otherInfo, genid)
+        
     if Box.objects.filter(user=user, name=name).count() < 1:
         if user  is None:
             return 
@@ -35,10 +37,6 @@ def likeDoStuff(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isA
         box.save()
     elif ignoreRewrite:
         Card.objects.filter(boxId=Box.objects.get(user=user, name=name).id).delete()
-
-    responses = main(f, name, optionalStr + " " + otherInfo, genid)
-        
-
 
 
     box = Box.objects.filter(user=user, name=name).first()

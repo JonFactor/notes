@@ -1,5 +1,6 @@
-import { getBoxSpecifics } from "functions/BackendMsg";
+import { deleteBox, getBoxSpecifics } from "functions/BackendMsg";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
 interface params {
   isDark: Boolean;
@@ -28,17 +29,43 @@ function BoxListCard({ isDark = true, id, userId }: params) {
       });
     };
     loadData();
+    setVisible(true);
   }, []);
+
+  const handleDelete = () => {
+    deleteBox(id, userId)
+      .then(() => {
+        setVisible(false);
+      })
+      .catch(() => {
+        alert("ERROR please try again later");
+      });
+  };
+
+  const navigator = useNavigate();
+
+  const handleGoInto = () => {
+    navigator(`/card?id=${id}`);
+  };
+
+  const [visible, setVisible] = useState(true);
   return (
     <div
       className={
         isDark
-          ? `  w-96 h-96 bg-[url(/boxcarddark.svg)] relative flex align-middle  flex-col px-2`
-          : `  w-96 h-96 bg-[url(/boxcardlight.svg)] relative flex align-middle  flex-col px-2`
+          ? ` ${
+              !visible && " invisible"
+            } w-96 h-96 bg-[url(/boxcarddark.svg)] relative flex align-middle  flex-col px-2`
+          : ` ${
+              !visible && " invisible"
+            } w-96 h-96 bg-[url(/boxcardlight.svg)] relative flex align-middle  flex-col px-2`
       }
       style={{ backgroundRepeat: "no-repeat" }}
     >
-      <div className="mt-28 w-9/10    flex flex-col align-middle relative">
+      <button
+        className="mt-28 w-9/10  cursor-pointer   flex flex-col align-middle relative"
+        onClick={handleGoInto}
+      >
         <div className="absolute flex justify-center w-full">
           <div className=" w-11/12  overflow-hidden ">
             <p
@@ -58,10 +85,15 @@ function BoxListCard({ isDark = true, id, userId }: params) {
         </div>
 
         <h2 className=" ml-4 mt-28 text-xl">Completions: {boxListData.comp}</h2>
-        <h2 className="ml-4  text-xl">Remeber/Forget: {boxListData.rtof}%</h2>
-      </div>
+        <h2 className="ml-4  text-xl">
+          Remeber/Forget: {Math.round(Number(boxListData.rtof) * 100) / 100}%
+        </h2>
+      </button>
       <div className=" w-full flex h-full justify-center align-bottom">
-        <button className=" w-6 aspect-square flex cursor-pointer mr-8 mt-4">
+        <button
+          className=" w-6 aspect-square flex cursor-pointer mr-8 mt-4"
+          onClick={handleDelete}
+        >
           <img src="x.svg" className=" w-full h-full" />
         </button>
       </div>

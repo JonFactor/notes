@@ -1,5 +1,6 @@
-import { getCards } from "functions/BackendMsg";
+import { deleteCard, getCards, updateProgressBox } from "functions/BackendMsg";
 import React, { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import FlashCard from "~/components/FlashCard";
 import TitleMod from "~/components/modules/TitleMod";
 import useWindowDimensions from "~/hooks/WindowDimensions";
@@ -9,10 +10,14 @@ function card() {
   const [cardInfo, setCardInfo] = useState([{}]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isQuestionSide, setIsQuestionSide] = useState(true);
+  const [rememberList, setRememberList] = useState<Array<number>>([]);
+  const [forgetList, setForgetList] = useState<Array<number>>([]);
+  const [justSaved, setJustSaved] = useState([]);
+
+  const [searchParms] = useSearchParams();
 
   const getBoxId = () => {
-    const id = 1;
-
+    const id = searchParms.get("id");
     return id;
   };
 
@@ -40,11 +45,80 @@ function card() {
   }, []);
 
   const handleRemember = () => {
+    setForgetList([...forgetList, currentCardIndex]);
     setCurrentCardIndex(currentCardIndex + 1);
   };
 
   const handleForget = () => {
+    setRememberList([...rememberList, currentCardIndex]);
     setCurrentCardIndex(currentCardIndex + 1);
+  };
+
+  const navigate = useNavigate();
+
+  const handleExit = () => {
+    navigate("/");
+    setCurrentCardIndex(0);
+  };
+
+  const handleSave = () => {
+    console.log("here");
+    const newCompleted = cardInfo.length - 1 >= currentCardIndex;
+
+    const respones = [];
+
+    const ids = [];
+
+    for (let i = 0; i < forgetList.length; i++) {
+      respones.push(false);
+      ids.push(cardInfo[forgetList[i]].id);
+    }
+
+    for (let i = 0; i < rememberList.length; i++) {
+      respones.push(true);
+      ids.push(cardInfo[rememberList[i]].id);
+    }
+
+    const filteredArray = ids.filter((item) => !justSaved.includes(item));
+    if (filteredArray.length < 1) {
+      alert("everything is already saved");
+      return;
+    }
+
+    const body = {
+      id: getBoxId(),
+      userId: getSetUser(),
+      isNewCompleted: newCompleted,
+      responses: { responses: respones, ids: filteredArray },
+    };
+
+    updateProgressBox(body)
+      .then((res) => {
+        alert("Saved!");
+        setJustSaved(ids);
+      })
+      .catch((res) => {
+        alert("ERROR");
+      });
+  };
+
+  const handleReset = () => {
+    setForgetList([]);
+    setRememberList([]);
+    setJustSaved([]);
+    setCurrentCardIndex(0);
+  };
+
+  const handleDeleteCard = () => {
+    deleteCard(cardInfo[currentCardIndex].id, getSetUser())
+      .then(() => {
+        alert("Completed!");
+        getCards(getBoxId(), getSetUser()).then(async (res) => {
+          const data = await res.json();
+          setCardInfo(data.cards);
+        });
+      })
+      .catch(() => alert("Error Occured"));
   };
 
   return (
@@ -54,7 +128,7 @@ function card() {
       <div className={`w-full justify-center flex flex-col  `}>
         {/* Main Content */}
         <div className={`mt-60 `}>
-          {cardInfo.length - 1 >= currentCardIndex + 1000 ? (
+          {cardInfo.length - 1 >= currentCardIndex ? (
             <FlashCard
               width={width}
               question={cardInfo[currentCardIndex].question}
@@ -63,6 +137,7 @@ function card() {
               handleForget={handleForget}
               isQuestionSide={isQuestionSide}
               currentCardIndex={currentCardIndex + 1}
+              totalCardsLength={cardInfo.length}
             />
           ) : (
             <div
@@ -79,15 +154,24 @@ function card() {
 
               <div className="  mt-6">
                 <div className="  float-left">
-                  <button className=" text-4xl bg-[#FFF2AA] px-8 py-2 rounded-md">
+                  <button
+                    className=" cursor-pointer text-4xl bg-[#FFF2AA] px-8 py-2 rounded-md"
+                    onClick={handleExit}
+                  >
                     Exit
                   </button>
-                  <button className=" text-4xl bg-[#FFF2AA] px-8 py-2 rounded-md  ml-8">
+                  <button
+                    className=" cursor-pointer text-4xl bg-[#FFF2AA] px-8 py-2 rounded-md  ml-8"
+                    onClick={handleSave}
+                  >
                     Save
                   </button>
                 </div>
 
-                <button className=" float-right text-4xl bg-[#FFF2AA] px-8 py-2 rounded-md">
+                <button
+                  className=" cursor-pointer float-right text-4xl bg-[#FFF2AA] px-8 py-2 rounded-md"
+                  onClick={handleReset}
+                >
                   Reset
                 </button>
               </div>
@@ -108,16 +192,29 @@ function card() {
           >
             {/* Left */}
             <div className=" float-left space-x-4">
-              <button className="  bg-white px-8 rounded-xl text-2xl font-bold py-2 cursor-pointer">
+              <button
+                className="  bg-white px-8 rounded-xl text-2xl font-bold py-2 cursor-pointer"
+                onClick={handleDeleteCard}
+              >
                 <h2>Delete Card</h2>
               </button>
               {width > 1360 && (
-                <button className=" bg-white px-5 rounded-xl text-2xl  py-2  cursor-pointer">
+                <button
+                  className=" bg-white px-5 rounded-xl text-2xl  py-2  cursor-pointer"
+                  onClick={handleExit}
+                >
                   <h2>Exit</h2>
                 </button>
               )}
 
-              <button className=" bg-white px-5 rounded-xl text-2xl  py-2 cursor-pointer">
+              <button
+                className=" bg-white px-5 rounded-xl text-2xl  py-2 cursor-pointer"
+                onClick={() => {
+                  if (currentCardIndex > 0) {
+                    handleSave();
+                  }
+                }}
+              >
                 <h2>Save</h2>
               </button>
             </div>

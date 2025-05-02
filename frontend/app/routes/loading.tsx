@@ -6,12 +6,12 @@ import TitleMod from "~/components/modules/TitleMod";
 import useWindowDimensions from "~/hooks/WindowDimensions";
 
 function loading() {
-  const [progId, setProgId] = useState("");
+  const [progId, setProgId] = useState<string>();
   const { height, width } = useWindowDimensions();
   const [searchParms] = useSearchParams();
 
   useEffect(() => {
-    const id = searchParms.get("progId");
+    const id = searchParms.get("id");
     setProgId(id);
   }, []);
 
@@ -25,18 +25,31 @@ function loading() {
           </h1>
           <h2 className=" text-5xl">Flappy Bee</h2>
           <div className=" mt-24">
-            <LoadingInicator
-              progId={progId}
-              setProgId={setProgId}
-            ></LoadingInicator>
+            {progId !== undefined && (
+              <LoadingInicator
+                progId={progId}
+                widthSmol={width <= 850}
+              ></LoadingInicator>
+            )}
           </div>
         </div>
       </div>
-
-      <div className=" w-full flex justify-center h-full mt-12">
+      <div
+        className={` ${
+          width <= 850 && "flex-col"
+        }   w-full flex justify-center h-full mt-12 space-x-5`}
+      >
         <iframe
           src="https://flappycreator.com/flappy.php?id=680be029bab6c"
-          className={` w-${width > 530 ? 3 : 6}/6 h-[425px]`}
+          className={` h-[425px] ${width <= 850 && "mx-auto"}`}
+        ></iframe>
+        <iframe
+          className={` w-[600px] h-[425px] ${width <= 850 && "mx-auto"} ${
+            width <= 850 && "mt-8"
+          }`}
+          src="https://www.youtube.com/embed/O96fE1E-rf8?si=3xnwsfJuLFshVlyH&amp;start=20"
+          title="YouTube video player"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         ></iframe>
       </div>
     </div>

@@ -23,10 +23,14 @@ class BoxSpecificsView(APIView):
         boxId = request.query_params['id']
         userId = request.query_params['userId']
 
-        box  =  Box.objects.filter(id=boxId, user=userId).first()
+        box  =  Box.objects.filter(id=boxId).first()
+
         if  box  is  None:
             return Response()
-        
+
+        if box.user != userId:
+            return Response()
+
         # get r  to f
         cards  = Card.objects.filter(boxId=boxId)
 
@@ -42,11 +46,11 @@ class BoxSpecificsView(APIView):
         elif Rcount ==  0:
             rtof = 0
         elif Fcount ==  0:
-            rtof = 100
+            rtof = 1
         else:
             rtof = Rcount / Fcount
         
-        data = {"name":box.name, "Completions": box.numCompletions, "RtoF":rtof}
+        data = {"name":box.name, "Completions": box.numCompletions, "RtoF":rtof*100}
 
 
 
@@ -115,10 +119,10 @@ class BoxView(APIView):
 
         box = Box.objects.filter(id=boxId).first()
         if box is None:
-            return Response()
+            return Response(status=400)
         
         if box.user != userId:
-            return Response()
+            return Response(status=400)
         
         Box.objects.filter(id=boxId).first().delete()
 

@@ -11,6 +11,7 @@ interface params {
   handleForget: () => void;
   isQuestionSide: boolean;
   currentCardIndex: number;
+  totalCardsLength: number;
 }
 
 export default function FlashCard({
@@ -21,6 +22,7 @@ export default function FlashCard({
   width,
   isQuestionSide,
   currentCardIndex,
+  totalCardsLength,
 }: params) {
   return (
     <div
@@ -31,7 +33,9 @@ export default function FlashCard({
       {/* Top */}
       <div className="flex">
         <div className=" py-1 px-3  bg-white rounded-xl text-4xl ">
-          <h1>{currentCardIndex}</h1>
+          <h1>
+            {currentCardIndex} / {totalCardsLength}
+          </h1>
         </div>
         <h1 className=" my-auto  text-4xl font-semibold ml-5">Question</h1>
       </div>

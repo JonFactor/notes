@@ -2,43 +2,70 @@ import { getProgress } from "functions/BackendMsg";
 import React, { useEffect, useRef, useState } from "react";
 
 interface params {
-  setProgId: React.Dispatch<React.SetStateAction<string>>;
   progId: string;
+  widthSmol: boolean;
 }
 
-export default function LoadingInicator({ progId, setProgId }: params) {
+export default function LoadingInicator({ progId, widthSmol }: params) {
   const [percent, setPercent] = useState("0");
+  const [queue, setQueue] = useState(0);
 
   useEffect(() => {
     const doIt = () => {
       getProgress(progId).then(async (res) => {
         const data = await res.json();
-        console.log(data);
-        setPercent((data.status * 100).toString());
-
-        if (data.status === "1" || data.status === 1) {
-          setProgId("");
+        if (data.status !== null) {
+          setPercent((data.status * 100).toString());
         }
+
+        console.log(data.queuePlacement);
+
+        if (data.queuePlacement === null) {
+          return;
+        }
+
+        setQueue(data.queuePlacement);
       });
     };
+    doIt();
 
-    console.log(progId);
-
-    setInterval(() => {
-      if (progId === "" || progId === undefined) {
-        return;
-      }
-      doIt();
-    }, 5000);
+    setInterval(
+      () => {
+        if (percent === "100") {
+          return;
+        }
+        doIt();
+      },
+      queue <= 1 || queue === null || queue === undefined ? 15000 : 35000
+    );
   }, []);
 
+  if (percent === "100") {
+    return (
+      <div>
+        <h1 className=" text-7xl">All Finished!</h1>
+      </div>
+    );
+  }
+
   return (
-    <div className=" flex space-x-2">
-      <h1 className=" text-2xl my-auto">{percent}%</h1>
+    <div className={` ${widthSmol && "flex-col"} flex space-x-2`}>
+      {queue <= 1 || queue === null || queue === undefined ? (
+        <h1 className=" text-2xl my-auto">
+          {Math.floor(Number(percent) * 100) / 100}%
+        </h1>
+      ) : (
+        <h1 className=" text-2xl my-auto">{queue} Is Your Spot In Queue</h1>
+      )}
       <div className={` w-full bg-[#FFED82] rounded-xl h-10 `}>
         <div
           className={` h-full bg-black rounded-xl`}
-          style={{ width: `${percent}%` }}
+          style={{
+            width:
+              queue <= 1 || queue === null || queue === undefined
+                ? `${Math.floor(Number(percent) * 100) / 100}%`
+                : `${(1 / queue) * 100}%`,
+          }}
         />
       </div>
     </div>
