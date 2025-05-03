@@ -1,6 +1,6 @@
 from celery import shared_task
 
-from .ai import main
+from .ai import CardGenerate
 
 from cards.models import Card, Box
 from cards.serializers import BoxSerializer
@@ -8,24 +8,19 @@ from django.core.cache import cache
 from background_task import background
 import time
 
-# @shared_task
-# def check_redis_connection():
-#         try:
-#             cache.set('test_key', 'test_value', timeout=5)
-#             value = cache.get('test_key')
-#             if value == 'test_value':
-#                 return True
-#             else:
-#                 return False
-#         except Exception as e:
-#             print(f"Redis connection error: {e}")
-#             return False
+@background(queue="ai")
+def StudyGuideTask():
+    pass
 
 @background(queue="ai")
-def likeDoStuff(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki):
+def QuizGenerateTask():
+    pass
+
+@background(queue="ai")
+def CardGenerateTask(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki):
     cache.set(genid, 0)
 
-    responses = main(f, name, optionalStr + " " + otherInfo, genid)
+    responses = CardGenerate(f, name, optionalStr + " " + otherInfo, genid)
         
     if Box.objects.filter(user=user, name=name).count() < 1:
         if user  is None:

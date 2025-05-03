@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from .ai import main
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from cards.models import Card, Box
@@ -7,13 +6,22 @@ from cards.serializers import CardSerializer, BoxSerializer
 from .anki import createExportAnki
 from django.core.cache import cache
 import uuid
-from .tasks import likeDoStuff
+from .tasks import CardGenerateTask
 from background_task.models import Task
 
 # Create your views here.
 
+class GenerateLectureView(APIView):
+    def  post(self, request):
+        return Response()
 
+class GenerateStudyGuideView(APIView):
+    def post(self, request):
+        return Response()
 
+class GenerateQuizView(APIView):
+    def post(self, request):
+        return Response()
 
 
 class GenerateView(APIView):
@@ -41,7 +49,7 @@ class GenerateView(APIView):
             optionalStr = "dont use names of things like naming for items or concepts just the concepts themselves or peoples names in any of the questions make sure its just the content thats being tested not name remeberance"
 
         #print(likeDoStuff.delay(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki))
-        likeDoStuff(f, name, optionalStr, otherInfo, str(genid), user, ignoreRewrite, isAnki, verbose_name=genid)
+        CardGenerateTask(f, name, optionalStr, otherInfo, str(genid), user, ignoreRewrite, isAnki, verbose_name=genid)
         return Response({'id':genid})
 
 class ProgressView(APIView):

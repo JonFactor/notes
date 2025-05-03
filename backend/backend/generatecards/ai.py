@@ -2,7 +2,9 @@ import json, pathlib, time, httpx, ollama, os
 
 OLLAMA_CONNECTION_STR = os.environ.get("OLLAMA_CONNECTION_STR", "http://localhost:11434")
 OLLAMA_MODEL = os.environ.get("", "deepseek-r1:1.5b")
-PROMPT_TEMPLATE_PATH = os.environ.get("PROMPT_TEMPLATE_PATH", "prompt.txt")
+
+CARDS_PROMPT_TEMPLATE_PATH = os.environ.get("PROMPT_TEMPLATE_PATH", "promptcard.txt")
+QUIZ_PROMPT_TEMPLATE_PATH =  os.environ.get("PROMPT_TEMPLATE_PATH", "promptquiz.txt")
 
 def waitForServer(client: ollama.Client, tries:int):
     while tries > 0:
@@ -55,16 +57,24 @@ def getPages(b644:str, startPage):
 
 from django.core.cache import cache
 
-def main(b64:str, title:str, extraOptions:str="", id=0):
+def QuizGenerate():
+    client = ollama.Client(host=OLLAMA_CONNECTION_STR)
+    waitForServer(client, 10)
+    downloadModel(client, OLLAMA_MODEL)
+
+    promptTemplate = pathlib.Path(CARDS_PROMPT_TEMPLATE_PATH).read_text()
+
+def StudyGuideGenerate(): #TODO
+    pass
+
+def CardGenerate(b64:str, title:str, extraOptions:str="", id=0):
     
 
     client = ollama.Client(host=OLLAMA_CONNECTION_STR)
     waitForServer(client, 10)
     downloadModel(client, OLLAMA_MODEL)
 
-    
-
-    promptTemplate = pathlib.Path(PROMPT_TEMPLATE_PATH).read_text()
+    promptTemplate = pathlib.Path(CARDS_PROMPT_TEMPLATE_PATH).read_text()
 
     pages = getPages(b64, 1 )
     

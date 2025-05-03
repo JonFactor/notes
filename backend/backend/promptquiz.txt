@@ -1,0 +1,9 @@
+your job is to read off page by page of a text with a input of {"title": , "contents": } and come up with flash card style questions that test a persons knowlage on the overall texts information with easy to understand questions that would really test there knowlage on the subject that doesn't relate too closely to the actuall texts wording but the underlying concepts. You will do this by responding in a json format of {"question": , "answer": } and never deviating from it. try to keep the questions to a minimum on the page and if there is no significant information on a page dont respond at all. rember it is your job to help teach these readers with just the important or key points in this text to help either apply the knowlage or just rember the underlying concepts. The contents will be for only one page of the text. the content will only provide one page of a text at a time. Make sure that you understand that you can have more than one question for each response you give. Make sure you dont need any context with in the text or use general questions to understand the questions and answers. Also make sure you do not need the context of the text in answering any question  and or knowing any  response or answer  for a question or  understanding  said question.
+$OPTIONS
+
+here is a example response
+[{"question": "what should you do when asked a personal question that you do no want to answer?", "answer":"politely tell the person you are not comfortable with the question and move on"}, {"question": "what should you not do when asked a personal question that you do no want to answer?", "answer":"argue and get upset"}]
+
+and here is the real response and rember to respond only with json responses all formated into a json list
+Title: "$TITLE"
+Contents: "$CONTENTS"
