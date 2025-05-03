@@ -41,11 +41,11 @@ EXPOSE 8000
 
 RUN ["python", "manage.py", "makemigrations", "background_task"]
 
-RUN ["python", "manage.py", "migrate"]
+
 
 RUN ["python", "manage.py", "createcachetable"]
 
-RUN python manage.py process_tasks &
+RUN ["python", "manage.py", "migrate"]
 
-CMD ["gunicorn", "--preload", "--bind", "0.0.0.0:8000", "backend.wsgi:application"]
+CMD python manage.py process_tasks & gunicorn --preload --bind 0.0.0.0:8000 backend.wsgi:application 
 #CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
