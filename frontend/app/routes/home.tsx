@@ -12,13 +12,6 @@ import BoxListMod from "~/components/modules/BoxListMod";
 import useWindowDimensions from "~/hooks/WindowDimensions";
 
 export default function Home() {
-  const [cardData, setCardData] = useState({
-    id: "",
-    name: "",
-    cards: [],
-    completions: 0,
-  });
-
   const [boxsData, setBoxesData] = useState<any>({ ids: [] });
 
   const [refreshPlease, setRefreshPlease] = useState(false);
