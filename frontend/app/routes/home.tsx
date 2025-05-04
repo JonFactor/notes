@@ -20,10 +20,38 @@ export default function Home() {
   });
 
   const [boxsData, setBoxesData] = useState<any>({ ids: [] });
-
+  const [isBoxAvalible, setIsBoxAvalible] = useState(false);
+  const [isBoxOpen, setIsBoxOpen] = useState(false);
   const [refreshPlease, setRefreshPlease] = useState(false);
+  const [progId, setProgId] = useState("");
+
+  const [responses, setResponses] = useState<Array<boolean>>([]);
 
   const { width, height } = useWindowDimensions();
+
+  useEffect(() => {
+    // set box data in list here and device id
+    setBoxStuff();
+  }, []);
+
+  useEffect(() => {
+    setBoxStuff();
+  }, [refreshPlease]);
+
+  const setBoxStuff = async () => {
+    const user = getSetUser();
+
+    getUserBoxs(user)
+      .then(async (data) => {
+        const body = await data.json();
+        setBoxesData(body);
+      })
+      .catch((eerr) => console.log(eerr));
+  };
+
+  useEffect(() => {
+    setIsBoxAvalible(boxsData.ids.length > 0);
+  }, [boxsData]);
 
   const getSetUser = () => {
     const ummmkey = "flashcardappkeythingy";
@@ -34,6 +62,85 @@ export default function Home() {
     }
     return id;
   };
+
+  const handelProgSave = async () => {
+    const save = async () => {
+      // update info here by saving
+
+      // boxId = request.data["id"]
+      // userId = request.data["userId"]
+      // name = request.data.get("name")
+      // isNewCompleted = request.data["isNewCompleted"]
+      // responses = request.data["responses", {"respones":[], "ids":[]}]
+
+      const isFinalPage = cardData.cards.length === responses.length;
+      const body = {
+        id: cardData.id,
+        userId: getSetUser(),
+        name: cardData.name,
+        isNewCompleted: isFinalPage,
+        responses: {
+          responses: responses,
+          ids: cardData.cards.map((a) => a.id),
+        },
+      };
+
+      const worked = await updateProgressBox(body);
+
+      if (!worked) {
+        alert("ts didnt work :( try again.");
+        return;
+      }
+
+      setResponses([]);
+      alert("saved");
+
+      setIsBoxOpen(false);
+    };
+
+    save();
+  };
+
+  const handelOpenBox = async (id: any) => {
+    const userId = localStorage.getItem("flashcardappkeythingy");
+
+    await getCards(id, userId).then(async (res) => {
+      setCardData(await res.json());
+      setIsBoxOpen(true);
+    });
+
+    console.log(cardData);
+  };
+
+  const handelDelete = async (id: any) => {
+    const userId = localStorage.getItem("flashcardappkeythingy");
+    const boxIndex = boxsData.ids.indexOf(id);
+    await deleteBox(boxIndex, userId).then((res) => {
+      if (res.status === 200) {
+        const data = boxsData;
+        data.names.splice(boxIndex, 1);
+        data.ids.splice(boxIndex, 1);
+        setBoxesData({
+          names: data.names,
+          ids: data.ids,
+        });
+      }
+    });
+  };
+
+  const handelCardDelete = async () => {
+    const userId = localStorage.getItem("flashcardappkeythingy");
+    const card = cardData.cards[responses.length];
+    const id = card.id;
+
+    deleteCard(id, userId).then((res) => {
+      if (res.status === 200) {
+        handelOpenBox(card.boxId);
+      }
+    });
+  };
+
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   return (
     <div className={`w-full flex ${width < 1400 && "flex-col"}`}>
@@ -125,12 +232,7 @@ export default function Home() {
             style={{ width: width > 1400 ? "88%" : "100%" }}
           >
             {isBoxAvalible && (
-              <BoxListMod
-                boxIds={boxsData.ids}
-                userId={getSetUser()}
-                shouldRefresh={refreshPlease}
-                setShouldRefresh={setRefreshPlease}
-              />
+              <BoxListMod boxIds={boxsData.ids} userId={getSetUser()} />
             )}
           </div>
         </div>
