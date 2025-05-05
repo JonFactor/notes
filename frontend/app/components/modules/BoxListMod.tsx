@@ -3,6 +3,7 @@ import BoxListCard from "../BoxListCard";
 import useWindowDimensions from "~/hooks/WindowDimensions";
 import { getUserBoxs } from "functions/BackendMsg";
 import { useNavigate } from "react-router";
+import { getSetUser } from "functions/GetSetUser";
 
 function BoxListMod({ boxIds = [], userId = "" }) {
   const [tripBoxs, setTripBoxs] = useState<any>([[]]);
@@ -11,16 +12,6 @@ function BoxListMod({ boxIds = [], userId = "" }) {
   const [isBoxAvalible, setIsBoxAvalible] = useState(false);
   const [boxsData, setBoxsData] = useState();
   const [shouldRefresh, setShouldRefresh] = useState(false);
-
-  const getSetUser = () => {
-    const ummmkey = "flashcardappkeythingy";
-    let id = localStorage.getItem(ummmkey);
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem(ummmkey, id);
-    }
-    return id;
-  };
 
   useEffect(() => {
     setBoxStuff();

@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import FlashCard from "~/components/FlashCard";
 import TitleMod from "~/components/modules/TitleMod";
 import useWindowDimensions from "~/hooks/WindowDimensions";
+import { getSetUser } from "functions/GetSetUser";
 
 function card() {
   const { height, width } = useWindowDimensions();
@@ -18,16 +19,6 @@ function card() {
 
   const getBoxId = () => {
     const id = searchParms.get("id");
-    return id;
-  };
-
-  const getSetUser = () => {
-    const ummmkey = "flashcardappkeythingy";
-    let id = localStorage.getItem(ummmkey);
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem(ummmkey, id);
-    }
     return id;
   };
 

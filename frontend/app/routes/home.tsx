@@ -1,32 +1,35 @@
-import { useEffect, useRef, useState } from "react";
-import fs from "fs";
-import {
-  deleteBox,
-  deleteCard,
-  getCards,
-  getUserBoxs,
-  updateProgressBox,
-} from "functions/BackendMsg";
+import { useEffect, useState } from "react";
+import { getUserBoxs } from "functions/BackendMsg";
 import TitleMod from "~/components/modules/TitleMod";
 import BoxListMod from "~/components/modules/BoxListMod";
 import useWindowDimensions from "~/hooks/WindowDimensions";
+import { getSetUser } from "functions/GetSetUser";
 
 export default function Home() {
   const [boxsData, setBoxesData] = useState<any>({ ids: [] });
-
-  const [refreshPlease, setRefreshPlease] = useState(false);
+  const [isBoxAvalible, setIsBoxAvalible] = useState(false);
 
   const { width, height } = useWindowDimensions();
 
-  const getSetUser = () => {
-    const ummmkey = "flashcardappkeythingy";
-    let id = localStorage.getItem(ummmkey);
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem(ummmkey, id);
-    }
-    return id;
+  useEffect(() => {
+    // set box data in list here and device id
+    setBoxStuff();
+  }, []);
+
+  const setBoxStuff = async () => {
+    const user = getSetUser();
+
+    getUserBoxs(user)
+      .then(async (data) => {
+        const body = await data.json();
+        setBoxesData(body);
+      })
+      .catch((eerr) => console.log(eerr));
   };
+
+  useEffect(() => {
+    setIsBoxAvalible(boxsData.ids.length > 0);
+  }, [boxsData]);
 
   return (
     <div className={`w-full flex ${width < 1400 && "flex-col"}`}>
@@ -36,7 +39,7 @@ export default function Home() {
           <TitleMod vertical={false} absolute={false} />
           <h1 className=" ml-14 text-2xl">flashcard generator</h1>
           <div className="bg-[#F2DC5D] w-1/2 text-2xl ml-14 mt-2 rounded-xl  text-white  py-3">
-            <a href="/" className=" w-full flex">
+            <a href="https://linktr.ee/jonfactor" className=" w-full flex">
               <h1 className="  mx-auto">supporting projects</h1>
             </a>
           </div>
@@ -118,12 +121,7 @@ export default function Home() {
             style={{ width: width > 1400 ? "88%" : "100%" }}
           >
             {isBoxAvalible && (
-              <BoxListMod
-                boxIds={boxsData.ids}
-                userId={getSetUser()}
-                shouldRefresh={refreshPlease}
-                setShouldRefresh={setRefreshPlease}
-              />
+              <BoxListMod boxIds={boxsData.ids} userId={getSetUser()} />
             )}
           </div>
         </div>

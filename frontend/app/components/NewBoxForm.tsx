@@ -1,6 +1,7 @@
 import { generateBox } from "functions/BackendMsg";
 import React, { useEffect, useRef, useState } from "react";
 import { Router, useNavigate } from "react-router";
+import { getSetUser } from "functions/GetSetUser";
 
 export const NewBoxForm = () => {
   const [data, setData] = useState({
@@ -48,16 +49,6 @@ export const NewBoxForm = () => {
     const based = await convertBase64(file);
 
     setFile64(based);
-  };
-
-  const getSetUser = () => {
-    const ummmkey = "flashcardappkeythingy";
-    let id = localStorage.getItem(ummmkey);
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem(ummmkey, id);
-    }
-    return id;
   };
 
   function base64ToFile(base64String: string, fileName: string) {
