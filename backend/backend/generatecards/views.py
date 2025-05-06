@@ -36,6 +36,9 @@ class GenerateView(APIView):
         isRemeberingThingNames = request.data.get('isThingNames', True)
         otherInfo = request.data.get('otherInfo', "")
         isAnki = request.data.get("isAnki", False)
+        isYoutubeLink = request.data.get('isYt', False)
+        pageCount = request.data.get('pageCount', None)
+        includeNameInAi = request.data.get('includeNameTraining', False)
 
 
         optionalStr = ""
@@ -49,7 +52,7 @@ class GenerateView(APIView):
             optionalStr = "dont use names of things like naming for items or concepts just the concepts themselves or peoples names in any of the questions make sure its just the content thats being tested not name remeberance"
 
         #print(likeDoStuff.delay(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki))
-        CardGenerateTask(f, name, optionalStr, otherInfo, str(genid), user, ignoreRewrite, isAnki, verbose_name=genid)
+        CardGenerateTask(f, name, optionalStr, otherInfo, str(genid), user, ignoreRewrite, isAnki, isYoutubeLink, pageCount,includeNameInAi, verbose_name=genid)
         return Response({'id':genid})
 
 class ProgressView(APIView):

@@ -32,7 +32,7 @@ function generate() {
       >
         <div className=" flex  w-full">
           <div className=" bg-[#FFF7CC] px-6 py-3 rounded-full">
-            <h1 className="  text-3xl font-light">Create Flashcards</h1>
+            <h1 className="  text-3xl font-light">Create Flashcard Box</h1>
           </div>
         </div>
         <div className={width > 900 ? " mt-12" : ""}>

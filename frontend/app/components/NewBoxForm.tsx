@@ -11,7 +11,9 @@ export const NewBoxForm = () => {
     useAnki: false,
   });
 
-  const [progId, setProgId] = useState(null);
+  const [pageCount, setPageCount] = useState(10);
+
+  const [isDocument, setIsDocument] = useState(true);
 
   const uploadThingy = useRef<HTMLInputElement>(null);
 
@@ -96,6 +98,8 @@ export const NewBoxForm = () => {
       isThingNames: data.useTerminology,
       otherInfo: data.otherInfo,
       isAnki: data.useAnki,
+      isYt: !isDocument,
+      pageCount: pageCount,
     };
     if (file64 === undefined || file64 === null || file64.toString() === "") {
       alert("no file selected");
@@ -147,6 +151,44 @@ export const NewBoxForm = () => {
           className=" bg-white  text-black px-2  py-2 mt-1  w-full "
         />
       </div>
+      <div className=" flex flex-row mt-4">
+        <div className=" flex space-x-3">
+          <p className=" text-2xl">PDF / Document</p>
+          <input
+            type="radio"
+            checked={isDocument}
+            onChange={(e) => {
+              setIsDocument(true);
+            }}
+            className=" w-6"
+          />
+        </div>
+        <div className=" flex space-x-3 ml-12">
+          <p className=" text-2xl">Youtube URL</p>
+          <input
+            type="radio"
+            checked={!isDocument}
+            onChange={(e) => {
+              setIsDocument(false);
+            }}
+            className=" w-6"
+          />
+        </div>
+      </div>
+      {!isDocument && (
+        <div className="flex flex-col space-x-2 mt-4 text-3xl">
+          <p className=" font-semibold">Youtube URL</p>
+          <input
+            type="text"
+            value={file64}
+            onChange={(e) => {
+              setFile64(e.target.value);
+            }}
+            className=" bg-white  text-black px-2  py-2 mt-1  w-full "
+          />
+        </div>
+      )}
+
       <h1 className=" mt-6 text-3xl  font-semibold">Options</h1>
       <div className=" flex">
         <div className=" flex flex-col space-y-14 w-5/12  mt-6">
@@ -156,9 +198,11 @@ export const NewBoxForm = () => {
           <div className="flex  align-middle">
             <p className=" text-3xl  my-auto">use peoples names</p>
           </div>
-          <div className="flex  align-middle">
-            <p className=" text-3xl  my-auto">install anki file</p>
-          </div>
+          {isDocument && (
+            <div className="flex  align-middle">
+              <p className=" text-3xl  my-auto">install anki file</p>
+            </div>
+          )}
         </div>
         <div className=" flex flex-col space-y-9 mt-4">
           <input
@@ -177,64 +221,101 @@ export const NewBoxForm = () => {
             }}
             className=" bg-white rounded-md text-black px-1  w-14 h-14 "
           />
-          <input
-            type="checkbox"
-            checked={data.useAnki}
-            onChange={(e) => {
-              setData({ ...data, useAnki: e.target.checked });
-            }}
-            className=" bg-white rounded-md text-black px-1 w-14 h-14 "
-          />
-        </div>
-        <div className="w-5/10 px-12  py-2 mt-2 flex  ">
-          {file64 === null && uploadThingy !== null ? (
-            <button
-              className="bg-[#FFF2AA] w-full h-full rounded-md text-4xl"
-              onClick={handelFile}
-            >
-              Upload Document
-            </button>
-          ) : (
-            <div>
-              {uploadThingy.current !== null &&
-                uploadThingy.current.files !== null && (
-                  <div className=" px-6 py-4 bg-[#FFF2AA] rounded-xl">
-                    <p className=" text-xl">
-                      {uploadThingy.current.files[0].name}
-                    </p>
-                  </div>
-                )}
-
-              <button
-                className="bg-[#FFF2AA] py-2 rounded-md text-xl w-full mt-6 "
-                onClick={handelFile}
-              >
-                Replace Document
-              </button>
-            </div>
+          {isDocument && (
+            <input
+              type="checkbox"
+              checked={data.useAnki}
+              onChange={(e) => {
+                setData({ ...data, useAnki: e.target.checked });
+              }}
+              className=" bg-white rounded-md text-black px-1 w-14 h-14 "
+            />
           )}
         </div>
+        {isDocument && (
+          <div className="w-5/10 px-12  py-2 mt-2 flex  ">
+            {file64 === null && uploadThingy !== null ? (
+              <button
+                className="bg-[#FFF2AA] w-full h-full rounded-md text-4xl"
+                onClick={handelFile}
+              >
+                Upload Document
+              </button>
+            ) : (
+              <div>
+                {uploadThingy.current !== null &&
+                  uploadThingy.current.files !== null && (
+                    <div className=" px-6 py-4 bg-[#FFF2AA] rounded-xl">
+                      <p className=" text-xl">
+                        {uploadThingy.current.files[0].name}
+                      </p>
+                    </div>
+                  )}
+
+                <button
+                  className="bg-[#FFF2AA] py-2 rounded-md text-xl w-full mt-6 "
+                  onClick={handelFile}
+                >
+                  Replace Document
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      <div className="flex flex-col space-x-2 mt-8 text-3xl">
-        <p className=" font-semibold">Other Instructions</p>
-        <input
-          type="text"
-          value={data.otherInfo}
-          onChange={(e) => {
-            setData({ ...data, otherInfo: e.target.value });
-          }}
-          className=" bg-white  text-black px-2  py-2 mt-1  w-full"
-        />
+      <div className=" flex w-full space-x-6 mt-8">
+        <div className="flex flex-col space-x-2  text-3xl w-1/2">
+          <p className=" font-semibold">Other Instructions</p>
+          <input
+            type="text"
+            value={data.otherInfo}
+            placeholder="Special Instructions"
+            onChange={(e) => {
+              setData({ ...data, otherInfo: e.target.value });
+            }}
+            className=" bg-white  text-black px-2  py-2 mt-1  w-full"
+          />
+        </div>
+        <div className=" w-1/2">
+          <p className="text-3xl">Page Count</p>
+          <input
+            type="text"
+            value={pageCount}
+            onChange={(e) => {
+              if (!isNaN(parseInt(e.target.value)))
+                setPageCount(parseInt(e.target.value));
+            }}
+            className=" bg-white  text-black px-4  py-2 mt-1 text-3xl  w-1/2 text-end"
+          />
+        </div>
       </div>
 
-      <div className=" flex justify-end mt-10 w-full">
-        <button
-          className="w-1/3 bg-[#FFF6D0] px-6 py-3 rounded-xl"
-          onClick={handelBoxCreate}
-        >
-          <p className="w-full text-left text-2xl">Submit</p>
-        </button>
+      <div className=" flex mt-10 w-full ">
+        <div className=" flex w-1/2">
+          {!isDocument && (
+            <>
+              <p className=" text-3xl my-auto ">install anki file</p>
+              <input
+                type="checkbox"
+                checked={data.useAnki}
+                onChange={(e) => {
+                  setData({ ...data, useAnki: e.target.checked });
+                }}
+                className=" bg-white rounded-md text-black px-1 w-14 h-14 ml-10 "
+              />
+            </>
+          )}
+        </div>
+
+        <div className=" flex justify-end w-1/2">
+          <button
+            className="w-4/5 bg-[#FFF6D0] px-6 py-3 rounded-xl"
+            onClick={handelBoxCreate}
+          >
+            <p className="w-full text-left text-2xl">Submit</p>
+          </button>
+        </div>
       </div>
     </div>
   );

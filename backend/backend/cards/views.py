@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import Card, Box
-from .serializers import CardSerializer, BoxSerializer
+from .models import Card, Box, Token
+from .serializers import CardSerializer, TokenSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 # Create your views here.
@@ -129,26 +129,6 @@ class BoxView(APIView):
         return Response('ok')
 
 class CardView(APIView):
-    # def patch(self, request):
-    #     '  update the correct or incorrect '
-
-    #     cardId = request.data.get('cardId')
-    #     user = request.data.get('user')
-    #     isForgetten = request.data.get('isForgotten', False)
-    #     isRemebered = request.data.get('isRemebered', False)
-
-        
-    #     card = Card.objects.filter(id=cardId).first()
-
-    #     if card is None:
-    #         return Response()
-        
-    #     if Box.objects.filter(id=card.boxId).first().user != user:
-    #         return Response()
-        
-    #     Card.objects.update(id=cardId, isForgetten=isForgetten, isRemebered=isRemebered)
-
-    #     return Response('ok')
     
     def delete(self, request):
 
@@ -169,3 +149,23 @@ class CardView(APIView):
             Box.objects.filter(id=card.boxId).first().delete()
 
         return Response('ok')
+    
+import datetime, timedelta
+class TokenView(APIView):
+    def get(self, request):
+        user = request.query_params.get('user')
+
+        token = Token.objects.filter(user=user).first()
+        if token is None:
+            Token.objects.create(user=user, count=100, lastUpdated=datetime.datetime.now())
+        
+        token = Token.objects.filter(user=user).first()
+        if token is None:
+            return Response({'count':0})
+        
+        if token.lastUpdated + timedelta(days=1) < datetime.datetime.now():
+            Token.objects.filter(user=user).update(count=100, lastUpdated=datetime.datetime.now())
+
+
+
+        return Response({'count':token.count})

@@ -63,7 +63,7 @@ function card() {
 
   const handleSave = () => {
     console.log("here");
-    const newCompleted = cardInfo.length - 1 >= currentCardIndex;
+    const newCompleted = cardInfo.length - 1 <= currentCardIndex;
 
     const respones = [];
 

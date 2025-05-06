@@ -9,7 +9,11 @@ class Card(models.Model):
     rememberCount = models.IntegerField(default=0)
     forgotCount = models.IntegerField(default=0)
     
-    
+class Token(models.Model):
+    user = models.CharField(max_length=2000, default="", unique=True)
+    count = models.IntegerField(default=100)
+    lastUpdated = models.DateTimeField()
+    hasHitLimitOnce = models.BooleanField(default=False)
 
 class Box(models.Model):
     name = models.CharField(max_length=300, default="NONE")

@@ -6,9 +6,10 @@ interface params {
   isDark: Boolean;
   id: string;
   userId: string;
+  isQuizMode: Boolean;
 }
 
-function BoxListCard({ isDark = true, id, userId }: params) {
+function BoxListCard({ isDark = true, id, userId, isQuizMode }: params) {
   const [boxListData, setBoxListData] = useState({
     name: "13434",
     comp: "321",
@@ -45,7 +46,7 @@ function BoxListCard({ isDark = true, id, userId }: params) {
   const navigator = useNavigate();
 
   const handleGoInto = () => {
-    navigator(`/card?id=${id}`);
+    navigator(`/${isQuizMode ? "quiz" : "card"}?id=${id}`);
   };
 
   const [visible, setVisible] = useState(true);

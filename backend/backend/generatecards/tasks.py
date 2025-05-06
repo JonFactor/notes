@@ -17,10 +17,10 @@ def QuizGenerateTask():
     pass
 
 @background(queue="ai")
-def CardGenerateTask(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki):
+def CardGenerateTask(f, name, optionalStr, otherInfo, genid, user, ignoreRewrite, isAnki, isYoutubeLink, pageCount, includeNameInAi=False):
     cache.set(genid, 0)
 
-    responses = CardGenerate(f, name, optionalStr + " " + otherInfo, genid)
+    responses = CardGenerate(f, name, optionalStr + " " + otherInfo, genid, isYoutubeLink, pageCount, includeNameInAi)
         
     if Box.objects.filter(user=user, name=name).count() < 1:
         if user  is None:

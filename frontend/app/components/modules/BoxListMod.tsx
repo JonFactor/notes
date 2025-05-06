@@ -3,6 +3,7 @@ import BoxListCard from "../BoxListCard";
 import useWindowDimensions from "~/hooks/WindowDimensions";
 import { getUserBoxs } from "functions/BackendMsg";
 import { useNavigate } from "react-router";
+import { getSetUser } from "functions/GetSetUser";
 
 function BoxListMod({ boxIds = [], userId = "" }) {
   const [tripBoxs, setTripBoxs] = useState<any>([[]]);
@@ -12,15 +13,7 @@ function BoxListMod({ boxIds = [], userId = "" }) {
   const [boxsData, setBoxsData] = useState();
   const [shouldRefresh, setShouldRefresh] = useState(false);
 
-  const getSetUser = () => {
-    const ummmkey = "flashcardappkeythingy";
-    let id = localStorage.getItem(ummmkey);
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem(ummmkey, id);
-    }
-    return id;
-  };
+  const [isQuizMode, setIsQuizMode] = useState(false);
 
   useEffect(() => {
     setBoxStuff();
@@ -64,6 +57,30 @@ function BoxListMod({ boxIds = [], userId = "" }) {
   }
   return (
     <div className=" w-full h-full  flex justify-center align-middle flex-col overflow-hidden">
+      <div className=" w-full bg-[#FFF2AA]">
+        <div className=" w-full mt-3 flex  ml-6 space-x-4">
+          <button
+            className={` px-6 py-1 text-3xl ${
+              !isQuizMode ? "bg-black  text-[#F2DC5D]" : "bg-[#F2DC5D]"
+            } rounded-3xl rounded-b-none`}
+            onClick={() => {
+              setIsQuizMode(false);
+            }}
+          >
+            <p>Flashcards</p>
+          </button>
+          <button
+            className={` px-6 py-1 text-3xl ${
+              isQuizMode ? "bg-black  text-[#F2DC5D]" : "bg-[#F2DC5D]"
+            } rounded-3xl rounded-b-none`}
+            onClick={() => {
+              setIsQuizMode(true);
+            }}
+          >
+            <p>Quiz</p>
+          </button>
+        </div>
+      </div>
       <div className=" relative flex flex-col  overflow-auto scroll-auto h-[930px]">
         {tripBoxs.map((val, ind) => {
           const areBlack = [
@@ -84,6 +101,7 @@ function BoxListMod({ boxIds = [], userId = "" }) {
                     isDark={areBlack[0]}
                     userId={userId}
                     id={val[0]}
+                    isQuizMode={isQuizMode}
                   />
                 </div>
                 {val.length > 1 && (
@@ -97,6 +115,7 @@ function BoxListMod({ boxIds = [], userId = "" }) {
                       isDark={areBlack[1]}
                       userId={userId}
                       id={val[1]}
+                      isQuizMode={isQuizMode}
                     />
                   </div>
                 )}
@@ -113,6 +132,7 @@ function BoxListMod({ boxIds = [], userId = "" }) {
                       isDark={areBlack[2]}
                       userId={userId}
                       id={val[2]}
+                      isQuizMode={isQuizMode}
                     />
                   </div>
                 )}
